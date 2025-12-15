@@ -7,13 +7,24 @@ st.set_page_config(page_title="Product Defect Detection", layout="centered")
 
 st.title("🔍 Product Defect Detection App")
 
-# ---------------- LOAD MODEL SAFELY ---------------- #
+# ---------------- LOAD MODEL ---------------- #
 @st.cache_resource
 def load_model():
-    model_path = os.path.join(os.path.dirname(__file__), "defect_pre.pkl")
+    base_dir = os.path.dirname(__file__)
+    model_path = os.path.join(base_dir, "defect_pre.pkl")
+
+    # DEBUG: show files in directory
+    if not os.path.exists(model_path):
+        st.error("❌ defect_pre.pkl NOT FOUND")
+        st.write("📂 Files in current directory:")
+        st.write(os.listdir(base_dir))
+        st.stop()
+
     with open(model_path, "rb") as file:
         model = pickle.load(file)
+
     return model
+
 
 model = load_model()
 
