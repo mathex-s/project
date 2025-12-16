@@ -1,46 +1,26 @@
 import streamlit as st
 import pickle
 import numpy as np
-import os
 
-# -----------------------------
-# Page config
-# -----------------------------
-st.set_page_config(page_title="Price Prediction", page_icon="📊")
-
-st.title("📱 Price Prediction App")
-
-# -----------------------------
 # Load model
-# -----------------------------
-@st.cache_resource
-def load_model():
-    model_path = os.path.join(os.path.dirname(__file__), "price_pred.pkl")
-    with open(model_path, "rb") as file:
-        model = pickle.load(file)
-    return model
+with open("price_pred.pkl", "rb") as f:
+    model = pickle.load(f)
 
-model = load_model()
+st.title("📱 Mobile Price Prediction")
 
-st.success("Model loaded successfully ✅")
+# Inputs (MUST match training features & order)
+ram = st.number_input("RAM (GB)", min_value=1, max_value=32, step=1)
+storage = st.number_input("Storage (GB)", min_value=8, max_value=512, step=8)
+camera = st.number_input("Camera (MP)", min_value=5, max_value=200, step=1)
+battery = st.number_input("Battery (mAh)", min_value=1000, max_value=7000, step=100)
 
-# -----------------------------
-# User Input Section
-# -----------------------------
-st.subheader("Enter Input Values")
+if st.button("Predict Price"):
+    # ✅ VERY IMPORTANT: 2D array
+    input_data = np.array([[ram, storage, camera, battery]])
 
-# 👉 CHANGE these inputs IF your model uses different features
-feature1 = st.number_input("Feature 1", value=0.0)
-feature2 = st.number_input("Feature 2", value=0.0)
-feature3 = st.number_input("Feature 3", value=0.0)
-feature4 = st.number_input("Feature 4", value=0.0)
+    # Debug check
+    st.write("Input shape:", input_data.shape)
+    st.write("Model expects features:", model.n_features_in_)
 
-# -----------------------------
-# Prediction
-# -----------------------------
-if st.button("Predict"):
-    input_data = np.array([[feature1, feature2, feature3, feature4]])
-    
     prediction = model.predict(input_data)
-
-    st.success(f"🔮 Predicted Result: **{prediction[0]}**")
+    st.success(f"💰 Predicted Price: ₹ {int(prediction[0])}")
