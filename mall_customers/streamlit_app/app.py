@@ -62,15 +62,23 @@ gender_encoded = 1 if gender == "Male" else 0
 X = np.array([[age, annual_income, spending_score, gender_encoded]])
 
 # ---------------- PREDICTION ----------------
+from sklearn.cluster import AgglomerativeClustering
+
 if st.button("Predict Customer Cluster"):
     try:
-        # Hierarchical clustering requires at least 2 samples
+        # Two samples (required)
         X = np.array([
             [age, annual_income, spending_score, gender_encoded],
             [age + 1, annual_income + 1, spending_score + 1, gender_encoded]
         ])
 
-        cluster = model.fit_predict(X)
+        # Create a NEW clustering model with n_clusters = 2
+        temp_model = AgglomerativeClustering(
+            n_clusters=2,
+            linkage="ward"
+        )
+
+        cluster = temp_model.fit_predict(X)
 
         st.success(f"🧩 Customer belongs to Cluster: {int(cluster[0])}")
 
