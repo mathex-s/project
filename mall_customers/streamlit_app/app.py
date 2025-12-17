@@ -64,8 +64,16 @@ X = np.array([[age, annual_income, spending_score, gender_encoded]])
 # ---------------- PREDICTION ----------------
 if st.button("Predict Customer Cluster"):
     try:
+        # Hierarchical clustering requires at least 2 samples
+        X = np.array([
+            [age, annual_income, spending_score, gender_encoded],
+            [age + 1, annual_income + 1, spending_score + 1, gender_encoded]
+        ])
+
         cluster = model.fit_predict(X)
+
         st.success(f"🧩 Customer belongs to Cluster: {int(cluster[0])}")
+
     except Exception as e:
         st.error(f"Prediction error: {e}")
 
