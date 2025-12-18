@@ -2,15 +2,26 @@ import streamlit as st
 import pickle
 import numpy as np
 import os
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
 
 # -------------------------------
-# Load model (tuple)
+# Load model (robust)
 # -------------------------------
 @st.cache_resource
 def load_model():
     model_path = os.path.join(os.path.dirname(__file__), "advertising_poly_model.pkl")
     with open(model_path, "rb") as file:
-        poly, model = pickle.load(file)   # 👈 unpack tuple
+        obj1, obj2 = pickle.load(file)
+
+    # Detect which is PolynomialFeatures
+    if hasattr(obj1, "transform"):
+        poly = obj1
+        model = obj2
+    else:
+        model = obj1
+        poly = obj2
+
     return poly, model
 
 poly, model = load_model()
