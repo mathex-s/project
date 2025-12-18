@@ -1,16 +1,20 @@
+import streamlit as st
+import pickle
 import numpy as np
 import os
-import pickle
-import streamlit as st
 
+# -----------------------------
+# Load model safely
+# -----------------------------
 @st.cache_resource
 def load_model():
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    MODEL_PATH = os.path.join(BASE_DIR, "svm_iris_model.pkl")
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    model_path = os.path.join(base_dir, "svm_iris_model.pkl")
 
-    with open(MODEL_PATH, "rb") as file:
+    with open(model_path, "rb") as file:
         obj = pickle.load(file)
 
+    # Handle (model, scaler) or model-only
     if isinstance(obj, tuple):
         model = obj[0]
         scaler = obj[1] if len(obj) > 1 else None
@@ -20,13 +24,15 @@ def load_model():
 
     return model, scaler
 
+
+# ✅ DEFINE model and scaler HERE
+model, scaler = load_model()
+
 # -----------------------------
-# Streamlit UI
+# UI
 # -----------------------------
 st.title("Iris Flower Prediction 🌸")
-st.write("Enter flower measurements")
 
-# 🌼 Iris dataset feature names
 sepal_length = st.number_input("Sepal Length (cm)", min_value=0.0)
 sepal_width  = st.number_input("Sepal Width (cm)", min_value=0.0)
 petal_length = st.number_input("Petal Length (cm)", min_value=0.0)
@@ -44,13 +50,12 @@ if st.button("Predict"):
             petal_width
         ]])
 
-        # Apply scaler if available
+        # Apply scaler ONLY if it exists
         if scaler is not None:
             input_data = scaler.transform(input_data)
 
         prediction = model.predict(input_data)[0]
 
-        # Iris class labels
         class_names = {
             0: "Setosa",
             1: "Versicolor",
