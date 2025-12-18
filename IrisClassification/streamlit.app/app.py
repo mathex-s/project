@@ -1,16 +1,15 @@
-import streamlit as st
+import os
 import pickle
-import numpy as np
+import streamlit as st
 
-# -----------------------------
-# Load model safely
-# -----------------------------
 @st.cache_resource
 def load_model():
-    with open("svm_iris_model.pkl", "rb") as file:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    MODEL_PATH = os.path.join(BASE_DIR, "svm_iris_model.pkl")
+
+    with open(MODEL_PATH, "rb") as file:
         obj = pickle.load(file)
 
-    # Handle (model, scaler) case
     if isinstance(obj, tuple):
         model = obj[0]
         scaler = obj[1] if len(obj) > 1 else None
@@ -19,9 +18,6 @@ def load_model():
         scaler = None
 
     return model, scaler
-
-
-model, scaler = load_model()
 
 # -----------------------------
 # Streamlit UI
