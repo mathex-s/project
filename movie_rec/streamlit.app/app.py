@@ -9,7 +9,7 @@ st.title("🎬 Movie Recommendation App")
 
 # ---------- User Input ----------
 OMDB_API_KEY = "1b456bd2"  # Replace with your OMDb API key
-DATA_PATH = "/kaggle/input/tmdb-5000-movies-dataset/movies_metadata.csv"  # Replace with your Kaggle path
+DATA_PATH = "muhammadnaumank/tmdb-5000-movies-dataset"  # Replace with your Kaggle path
 
 # ---------- Load Dataset ----------
 @st.cache_data
