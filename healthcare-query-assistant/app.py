@@ -1,77 +1,85 @@
 import streamlit as st
 import google.generativeai as genai
 
-# Page configuration
+# Configure page
 st.set_page_config(
     page_title="Healthcare Query Assistant",
     page_icon="🏥",
-    layout="centered"
+    layout="wide"
 )
 
-# Configure Gemini API
+# Configure Gemini
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-# Load Gemini model
+# Load model
 model = genai.GenerativeModel("gemini-2.5-flash")
 
 # Title
 st.title("🏥 Healthcare Query Assistant")
-st.write("Ask any healthcare-related question and get AI-powered guidance.")
+st.write("Ask any healthcare-related question.")
+
+# Chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# Display previous messages
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
 # User input
-question = st.text_area(
-    "Enter your healthcare question:",
-    placeholder="Example: What are the symptoms of diabetes?"
-)
+prompt = st.chat_input("Type your healthcare question...")
 
-# Button
-if st.button("Get Answer"):
+if prompt:
 
-    if question.strip():
+    # Show user message
+    st.chat_message("user").markdown(prompt)
 
-        with st.spinner("Generating answer..."):
+    st.session_state.messages.append(
+        {"role": "user", "content": prompt}
+    )
 
-            prompt = f"""
-            You are a healthcare assistant.
+    with st.spinner("Generating answer..."):
 
-            Rules:
-            - Answer only healthcare-related questions.
-            - Use simple and clear language.
-            - Keep answers informative and concise.
-            - Do not provide medical diagnoses.
-            - Recommend consulting a healthcare professional when necessary.
+        healthcare_prompt = f"""
+        You are a Healthcare Query Assistant.
 
-            User Question:
-            {question}
-            """
+        Rules:
+        - Answer healthcare-related questions clearly.
+        - Use simple language.
+        - Do not provide medical diagnoses.
+        - Suggest consulting a healthcare professional when necessary.
+        - If the question is unrelated to healthcare, politely say that you only answer healthcare questions.
 
-            try:
-                response = model.generate_content(prompt)
+        User Question:
+        {prompt}
+        """
 
-                st.subheader("Answer")
-                st.write(response.text)
+        try:
+            response = model.generate_content(healthcare_prompt)
 
-                st.info(
-                    "Disclaimer: This information is for educational purposes only and is not a substitute for professional medical advice."
-                )
+            answer = response.text
 
-            except Exception as e:
-                st.error(f"Error: {e}")
+            with st.chat_message("assistant"):
+                st.markdown(answer)
 
-    else:
-        st.warning("Please enter a question.")
+            st.session_state.messages.append(
+                {"role": "assistant", "content": answer}
+            )
+
+        except Exception as e:
+            st.error(f"Error: {e}")
 
 # Sidebar
 with st.sidebar:
     st.header("About")
     st.write(
-        "This Healthcare Query Assistant uses Google's Gemini AI "
-        "to answer healthcare-related questions."
+        "AI-powered Healthcare Query Assistant using Google Gemini."
     )
 
-    st.header("Example Questions")
+    st.header("Sample Questions")
     st.write("• What is diabetes?")
-    st.write("• What causes headaches?")
+    st.write("• Symptoms of dengue")
     st.write("• How can I improve my sleep?")
-    st.write("• What are the symptoms of dengue?")
+    st.write("• What causes headaches?")
     st.write("• How much water should I drink daily?")
