@@ -1,31 +1,30 @@
-```python
 import streamlit as st
 import google.generativeai as genai
 
-# Configure page
+# Page configuration
 st.set_page_config(
     page_title="Healthcare Query Assistant",
     page_icon="🏥",
     layout="centered"
 )
 
-# Gemini API Key from Streamlit Secrets
+# Configure Gemini API
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
-# Load Gemini Model
+# Load Gemini model
 model = genai.GenerativeModel("gemini-2.5-flash")
 
 # Title
 st.title("🏥 Healthcare Query Assistant")
-st.markdown("Ask any healthcare-related question and get AI-powered guidance.")
+st.write("Ask any healthcare-related question and get AI-powered guidance.")
 
-# User Input
+# User input
 question = st.text_area(
     "Enter your healthcare question:",
     placeholder="Example: What are the symptoms of diabetes?"
 )
 
-# Ask Button
+# Button
 if st.button("Get Answer"):
 
     if question.strip():
@@ -33,15 +32,14 @@ if st.button("Get Answer"):
         with st.spinner("Generating answer..."):
 
             prompt = f"""
-            You are a Healthcare Query Assistant.
+            You are a healthcare assistant.
 
-            Guidelines:
-            - Answer healthcare-related questions clearly.
-            - Use simple language.
-            - Keep answers concise and informative.
-            - Do not diagnose diseases.
-            - Advise users to consult a healthcare professional for medical concerns.
-            - If the question is unrelated to healthcare, politely explain that you only answer healthcare questions.
+            Rules:
+            - Answer only healthcare-related questions.
+            - Use simple and clear language.
+            - Keep answers informative and concise.
+            - Do not provide medical diagnoses.
+            - Recommend consulting a healthcare professional when necessary.
 
             User Question:
             {question}
@@ -54,7 +52,7 @@ if st.button("Get Answer"):
                 st.write(response.text)
 
                 st.info(
-                    "Disclaimer: This chatbot provides general health information only and is not a substitute for professional medical advice."
+                    "Disclaimer: This information is for educational purposes only and is not a substitute for professional medical advice."
                 )
 
             except Exception as e:
@@ -71,10 +69,9 @@ with st.sidebar:
         "to answer healthcare-related questions."
     )
 
-    st.header("Examples")
+    st.header("Example Questions")
     st.write("• What is diabetes?")
-    st.write("• How can I improve my sleep?")
     st.write("• What causes headaches?")
-    st.write("• Symptoms of dengue")
-    st.write("• Benefits of drinking water")
-```
+    st.write("• How can I improve my sleep?")
+    st.write("• What are the symptoms of dengue?")
+    st.write("• How much water should I drink daily?")
